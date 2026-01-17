@@ -3,8 +3,6 @@
 **Track your team's productivity with ease!**
 
 Created by **Karas Barsoum**
-- 📸 Instagram: [@karas_barsoum](https://instagram.com/karas_barsoum)
-- 📞 Phone: (615) 664-7276
 
 ---
 
