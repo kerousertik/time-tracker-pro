@@ -396,7 +396,7 @@ class TimeTracker {
                 <div class="summary-info">
                     <h4>${this.escapeHtml(item.name)}</h4>
                     <div class="summary-hours">
-                        ${this.formatHours(item.totalMs)} <span>hours</span>
+                        ${this.formatDuration(item.totalMs)}
                     </div>
                 </div>
             </div>

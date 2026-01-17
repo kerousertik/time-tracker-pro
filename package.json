@@ -26,8 +26,14 @@
       "!.git/**"
     ],
     "win": {
-      "target": "portable",
-      "icon": "icon.ico"
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Time Tracker Pro"
     }
   }
 }
