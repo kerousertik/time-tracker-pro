@@ -1,0 +1,33 @@
+{
+  "name": "time-tracker-pro",
+  "version": "1.0.0",
+  "description": "Time Tracker Pro - Track your team's productivity. Powered by Karas Barsoum",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64"
+  },
+  "author": "Karas Barsoum",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.karasbarsoum.timetrackerpro",
+    "productName": "Time Tracker Pro",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!.git/**"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "icon.ico"
+    }
+  }
+}

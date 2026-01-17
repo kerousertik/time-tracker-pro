@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracker Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">⏱️</div>
+                <h1>Time Tracker Pro</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="exportPdfBtn">
+                    <span class="btn-icon">📄</span>
+                    Export PDF Report
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Add Person Section -->
+            <section class="add-person-section">
+                <div class="section-header">
+                    <h2>Add Team Member</h2>
+                </div>
+                <div class="add-person-form">
+                    <input type="text" id="personName" placeholder="Enter name..." class="input-field">
+                    <button class="btn btn-primary" id="addPersonBtn">
+                        <span class="btn-icon">➕</span>
+                        Add Person
+                    </button>
+                </div>
+            </section>
+
+            <!-- Active Sessions -->
+            <section class="sessions-section">
+                <div class="section-header">
+                    <h2>Team Members</h2>
+                    <span class="badge" id="activeCount">0 Active</span>
+                </div>
+                <div class="persons-grid" id="personsGrid">
+                    <!-- Person cards will be inserted here -->
+                </div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">👥</div>
+                    <h3>No Team Members Yet</h3>
+                    <p>Add a person above to start tracking their time</p>
+                </div>
+            </section>
+
+            <!-- Time Records History -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2>Time Records</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-ghost" id="adminToggleBtn">
+                            <span class="btn-icon">🔒</span>
+                            <span id="adminBtnText">Admin Login</span>
+                        </button>
+                        <button class="btn btn-ghost" id="clearHistoryBtn">
+                            <span class="btn-icon">🗑️</span>
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+                <div class="records-table-container">
+                    <table class="records-table" id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Clock In</th>
+                                <th>Clock Out</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <!-- Records will be inserted here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-records" id="emptyRecords">
+                        <p>No time records yet. Clock in to start tracking!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary Section -->
+            <section class="summary-section">
+                <div class="section-header">
+                    <h2>Total Hours Summary</h2>
+                </div>
+                <div class="summary-cards" id="summaryCards">
+                    <!-- Summary cards will be inserted here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-brand">
+                <span class="powered-label">Powered by</span>
+                <span class="powered-name">Karas Barsoum</span>
+                <div class="social-icons">
+                    <a href="https://instagram.com/karas_barsoum" target="_blank" class="social-btn"
+                        title="Instagram: @karas_barsoum">
+                        📸
+                    </a>
+                    <a href="tel:6156647276" class="social-btn" title="Call: (615) 664-7276">
+                        📞
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Export PDF Report</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Report Title</label>
+                    <input type="text" id="reportTitle" class="input-field" value="Time Tracking Report">
+                </div>
+                <div class="form-group">
+                    <label>Date Range</label>
+                    <div class="date-range">
+                        <input type="date" id="startDate" class="input-field">
+                        <span>to</span>
+                        <input type="date" id="endDate" class="input-field">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelExport">Cancel</button>
+                <button class="btn btn-primary" id="confirmExport">
+                    <span class="btn-icon">📄</span>
+                    Generate PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔐 Admin Login</h3>
+                <button class="modal-close" id="closeAdminModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Admin Password</label>
+                    <input type="password" id="adminPassword" class="input-field" placeholder="Enter admin password...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAdmin">Cancel</button>
+                <button class="btn btn-primary" id="confirmAdmin">
+                    <span class="btn-icon">🔓</span>
+                    Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Record Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Edit Record</h3>
+                <button class="modal-close" id="closeEditModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRecordId">
+                <div class="form-group">
+                    <label>Person Name</label>
+                    <input type="text" id="editPersonName" class="input-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="editDate" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Clock In Time</label>
+                    <input type="time" id="editClockIn" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Clock Out Time</label>
+                    <input type="time" id="editClockOut" class="input-field">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEdit">Cancel</button>
+                <button class="btn btn-primary" id="confirmEdit">
+                    <span class="btn-icon">💾</span>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
