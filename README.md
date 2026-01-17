@@ -33,21 +33,5 @@ Created by **Karas Barsoum**
 1. Create a GitHub account
 2. Double-click `DEPLOY_ONLINE.bat` and follow instructions
 
----
-
-## Admin Access
-
-Password: `adminMm`
-
-Admin can:
-- Edit clock in/out times
-- Modify dates
-- Adjust hours
-
----
-
-## License
-
-MIT License - Free to use and modify.
 
 **Powered by Karas Barsoum** ✨
