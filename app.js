@@ -36,9 +36,6 @@ class TimeTracker {
         this.endDateInput = document.getElementById('endDate');
         this.reportTitleInput = document.getElementById('reportTitle');
 
-        // API Console
-        this.apiConsoleBtn = document.getElementById('apiConsoleBtn');
-
         // Admin elements
         this.adminToggleBtn = document.getElementById('adminToggleBtn');
         this.adminBtnText = document.getElementById('adminBtnText');
@@ -66,11 +63,6 @@ class TimeTracker {
         this.personNameInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.addPerson();
         });
-
-        // API Console
-        if (this.apiConsoleBtn) {
-            this.apiConsoleBtn.addEventListener('click', () => this.openApiConsole());
-        }
 
         this.exportPdfBtn.addEventListener('click', () => this.openExportModal());
         this.closeModal.addEventListener('click', () => this.closeExportModal());
@@ -827,17 +819,6 @@ class TimeTracker {
 
         updateClock();
         setInterval(updateClock, 1000);
-    }
-
-    // Open API Console
-    openApiConsole() {
-        const width = 900;
-        const height = 800;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
-
-        window.open('api-console.html', '_blank',
-            `width=${width},height=${height},left=${left},top=${top},menubar=no,status=no,location=no`);
     }
 }
 
