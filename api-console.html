@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracker Pro - API Console</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: #111;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #0ff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        button {
+            background: #111;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        input {
+            background: #222;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .output {
+            background: #000;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+
+        .success {
+            color: #00ff00;
+        }
+
+        .error {
+            color: #ff0000;
+        }
+
+        .info {
+            color: #0ff;
+        }
+
+        .warning {
+            color: #ff0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #222;
+            color: #0ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🖥️ TIME TRACKER PRO - API CONSOLE</h1>
+        <p style="margin-bottom: 20px; color: #888;">Control your app programmatically | by Karas Barsoum</p>
+
+        <!-- Status Section -->
+        <div class="section">
+            <h2>📊 STATUS</h2>
+            <button onclick="getStatus()">Refresh Status</button>
+            <button onclick="getActiveUsers()">Who's Active?</button>
+            <button onclick="getAllPeople()">List All People</button>
+            <div class="output" id="statusOutput">Click a button to see status...</div>
+        </div>
+
+        <!-- People Management -->
+        <div class="section">
+            <h2>👥 PEOPLE MANAGEMENT</h2>
+            <input type="text" id="personName" placeholder="Enter name...">
+            <button onclick="addPerson()">Add Person</button>
+            <button onclick="removePerson()">Remove Person</button>
+            <div class="output" id="peopleOutput"></div>
+        </div>
+
+        <!-- Clock In/Out -->
+        <div class="section">
+            <h2>⏰ CLOCK IN / OUT</h2>
+            <input type="text" id="clockName" placeholder="Person name...">
+            <button onclick="clockIn()">Clock IN</button>
+            <button onclick="clockOut()">Clock OUT</button>
+            <button onclick="clockInAll()">Clock IN ALL</button>
+            <button onclick="clockOutAll()">Clock OUT ALL</button>
+            <div class="output" id="clockOutput"></div>
+        </div>
+
+        <!-- Records -->
+        <div class="section">
+            <h2>📋 RECORDS</h2>
+            <button onclick="getAllRecords()">View All Records</button>
+            <button onclick="getTodayRecords()">Today's Records</button>
+            <button onclick="getTotalHours()">Total Hours Summary</button>
+            <button onclick="exportData()">Export JSON Data</button>
+            <div class="output" id="recordsOutput"></div>
+        </div>
+
+        <!-- Admin -->
+        <div class="section">
+            <h2>🔐 ADMIN COMMANDS</h2>
+            <button onclick="clearAllRecords()">Clear All Records</button>
+            <button onclick="clearAllPeople()">Clear All People</button>
+            <button onclick="resetApp()">Factory Reset</button>
+            <div class="output" id="adminOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== DATA ACCESS ==========
+        function loadData(key) {
+            const data = localStorage.getItem(`timeTracker_${key}`);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveData(key, data) {
+            localStorage.setItem(`timeTracker_${key}`, JSON.stringify(data));
+        }
+
+        function log(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            el.innerHTML = `<span class="${type}">[${timestamp}] ${message}</span>`;
+        }
+
+        // ========== STATUS FUNCTIONS ==========
+        function getStatus() {
+            const persons = loadData('persons');
+            const records = loadData('records');
+            const active = persons.filter(p => p.isActive).length;
+
+            log('statusOutput', `
+📊 APP STATUS
+━━━━━━━━━━━━━━━━━━━━━━
+Total People: ${persons.length}
+Active Now:   ${active}
+Total Records: ${records.length}
+━━━━━━━━━━━━━━━━━━━━━━`, 'success');
+        }
+
+        function getActiveUsers() {
+            const persons = loadData('persons');
+            const active = persons.filter(p => p.isActive);
+
+            if (active.length === 0) {
+                log('statusOutput', '⚠️ No one is currently clocked in.', 'warning');
+                return;
+            }
+
+            let msg = '🟢 ACTIVE USERS:\n━━━━━━━━━━━━━━━━━━━━━━\n';
+            active.forEach(p => {
+                const duration = formatDuration(Date.now() - p.clockInTime);
+                msg += `• ${p.name} - Working for ${duration}\n`;
+            });
+            log('statusOutput', msg, 'success');
+        }
+
+        function getAllPeople() {
+            const persons = loadData('persons');
+            if (persons.length === 0) {
+                log('statusOutput', '⚠️ No people added yet.', 'warning');
+                return;
+            }
+
+            let msg = '👥 ALL PEOPLE:\n━━━━━━━━━━━━━━━━━━━━━━\n';
+            persons.forEach(p => {
+                const status = p.isActive ? '🟢 Active' : '⚪ Inactive';
+                msg += `• ${p.name} - ${status}\n`;
+            });
+            log('statusOutput', msg, 'info');
+        }
+
+        // ========== PEOPLE MANAGEMENT ==========
+        function addPerson() {
+            const name = document.getElementById('personName').value.trim();
+            if (!name) {
+                log('peopleOutput', '❌ Please enter a name.', 'error');
+                return;
+            }
+
+            const persons = loadData('persons');
+            if (persons.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+                log('peopleOutput', `❌ "${name}" already exists.`, 'error');
+                return;
+            }
+
+            persons.push({
+                id: Date.now().toString(),
+                name: name,
+                isActive: false,
+                clockInTime: null
+            });
+            saveData('persons', persons);
+            document.getElementById('personName').value = '';
+            log('peopleOutput', `✅ Added "${name}" successfully!`, 'success');
+        }
+
+        function removePerson() {
+            const name = document.getElementById('personName').value.trim();
+            if (!name) {
+                log('peopleOutput', '❌ Please enter a name.', 'error');
+                return;
+            }
+
+            let persons = loadData('persons');
+            const idx = persons.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+            if (idx === -1) {
+                log('peopleOutput', `❌ "${name}" not found.`, 'error');
+                return;
+            }
+
+            persons.splice(idx, 1);
+            saveData('persons', persons);
+            document.getElementById('personName').value = '';
+            log('peopleOutput', `✅ Removed "${name}" successfully!`, 'success');
+        }
+
+        // ========== CLOCK IN/OUT ==========
+        function clockIn() {
+            const name = document.getElementById('clockName').value.trim();
+            if (!name) {
+                log('clockOutput', '❌ Please enter a name.', 'error');
+                return;
+            }
+
+            let persons = loadData('persons');
+            const person = persons.find(p => p.name.toLowerCase() === name.toLowerCase());
+            if (!person) {
+                log('clockOutput', `❌ "${name}" not found. Add them first.`, 'error');
+                return;
+            }
+
+            if (person.isActive) {
+                log('clockOutput', `⚠️ "${person.name}" is already clocked in.`, 'warning');
+                return;
+            }
+
+            person.isActive = true;
+            person.clockInTime = Date.now();
+            saveData('persons', persons);
+            log('clockOutput', `✅ ${person.name} clocked IN at ${new Date().toLocaleTimeString()}`, 'success');
+        }
+
+        function clockOut() {
+            const name = document.getElementById('clockName').value.trim();
+            if (!name) {
+                log('clockOutput', '❌ Please enter a name.', 'error');
+                return;
+            }
+
+            let persons = loadData('persons');
+            const person = persons.find(p => p.name.toLowerCase() === name.toLowerCase());
+            if (!person) {
+                log('clockOutput', `❌ "${name}" not found.`, 'error');
+                return;
+            }
+
+            if (!person.isActive) {
+                log('clockOutput', `⚠️ "${person.name}" is not clocked in.`, 'warning');
+                return;
+            }
+
+            // Create record
+            const clockOutTime = Date.now();
+            const duration = clockOutTime - person.clockInTime;
+            const record = {
+                id: Date.now().toString(),
+                personId: person.id,
+                personName: person.name,
+                clockInTimestamp: person.clockInTime,
+                clockOutTimestamp: clockOutTime,
+                date: formatDate(person.clockInTime),
+                clockIn: formatTime(person.clockInTime),
+                clockOut: formatTime(clockOutTime),
+                duration: duration,
+                durationFormatted: formatDuration(duration)
+            };
+
+            const records = loadData('records');
+            records.unshift(record);
+            saveData('records', records);
+
+            person.isActive = false;
+            person.clockInTime = null;
+            saveData('persons', persons);
+
+            log('clockOutput', `✅ ${person.name} clocked OUT at ${new Date().toLocaleTimeString()}\n   Duration: ${record.durationFormatted}`, 'success');
+        }
+
+        function clockInAll() {
+            let persons = loadData('persons');
+            let count = 0;
+            persons.forEach(p => {
+                if (!p.isActive) {
+                    p.isActive = true;
+                    p.clockInTime = Date.now();
+                    count++;
+                }
+            });
+            saveData('persons', persons);
+            log('clockOutput', `✅ Clocked IN ${count} people at ${new Date().toLocaleTimeString()}`, 'success');
+        }
+
+        function clockOutAll() {
+            let persons = loadData('persons');
+            let records = loadData('records');
+            let count = 0;
+
+            persons.forEach(p => {
+                if (p.isActive) {
+                    const clockOutTime = Date.now();
+                    const duration = clockOutTime - p.clockInTime;
+                    records.unshift({
+                        id: Date.now().toString() + count,
+                        personId: p.id,
+                        personName: p.name,
+                        clockInTimestamp: p.clockInTime,
+                        clockOutTimestamp: clockOutTime,
+                        date: formatDate(p.clockInTime),
+                        clockIn: formatTime(p.clockInTime),
+                        clockOut: formatTime(clockOutTime),
+                        duration: duration,
+                        durationFormatted: formatDuration(duration)
+                    });
+                    p.isActive = false;
+                    p.clockInTime = null;
+                    count++;
+                }
+            });
+
+            saveData('persons', persons);
+            saveData('records', records);
+            log('clockOutput', `✅ Clocked OUT ${count} people at ${new Date().toLocaleTimeString()}`, 'success');
+        }
+
+        // ========== RECORDS ==========
+        function getAllRecords() {
+            const records = loadData('records');
+            if (records.length === 0) {
+                log('recordsOutput', '⚠️ No records found.', 'warning');
+                return;
+            }
+
+            let msg = '📋 ALL RECORDS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            records.slice(0, 20).forEach(r => {
+                msg += `${r.personName} | ${r.date} | ${r.clockIn} - ${r.clockOut} | ${r.durationFormatted}\n`;
+            });
+            if (records.length > 20) msg += `\n... and ${records.length - 20} more records`;
+            log('recordsOutput', msg, 'info');
+        }
+
+        function getTodayRecords() {
+            const records = loadData('records');
+            const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const todayRecords = records.filter(r => r.date === today);
+
+            if (todayRecords.length === 0) {
+                log('recordsOutput', '⚠️ No records for today.', 'warning');
+                return;
+            }
+
+            let msg = `📅 TODAY'S RECORDS (${today}):\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            todayRecords.forEach(r => {
+                msg += `${r.personName} | ${r.clockIn} - ${r.clockOut} | ${r.durationFormatted}\n`;
+            });
+            log('recordsOutput', msg, 'info');
+        }
+
+        function getTotalHours() {
+            const records = loadData('records');
+            const summary = {};
+
+            records.forEach(r => {
+                if (!summary[r.personName]) summary[r.personName] = 0;
+                summary[r.personName] += r.duration;
+            });
+
+            let msg = '⏱️ TOTAL HOURS SUMMARY:\n━━━━━━━━━━━━━━━━━━━━━━\n';
+            for (const [name, ms] of Object.entries(summary)) {
+                msg += `${name}: ${formatDuration(ms)}\n`;
+            }
+            log('recordsOutput', msg, 'success');
+        }
+
+        function exportData() {
+            const data = {
+                persons: loadData('persons'),
+                records: loadData('records'),
+                exportedAt: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `timetracker_export_${Date.now()}.json`;
+            a.click();
+
+            log('recordsOutput', '✅ Data exported to JSON file!', 'success');
+        }
+
+        // ========== ADMIN ==========
+        function clearAllRecords() {
+            if (!confirm('Are you sure you want to delete ALL records?')) return;
+            saveData('records', []);
+            log('adminOutput', '✅ All records cleared!', 'success');
+        }
+
+        function clearAllPeople() {
+            if (!confirm('Are you sure you want to delete ALL people?')) return;
+            saveData('persons', []);
+            log('adminOutput', '✅ All people cleared!', 'success');
+        }
+
+        function resetApp() {
+            if (!confirm('FACTORY RESET: Delete ALL data?')) return;
+            localStorage.removeItem('timeTracker_persons');
+            localStorage.removeItem('timeTracker_records');
+            log('adminOutput', '✅ App reset to factory defaults!', 'success');
+        }
+
+        // ========== HELPERS ==========
+        function formatDuration(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+            });
+        }
+
+        // Initial status
+        getStatus();
+    </script>
+</body>
+
+</html>
