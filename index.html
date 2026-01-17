@@ -31,15 +31,34 @@
         <main class="main-content">
             <!-- Add Person Section -->
             <section class="add-person-section">
-                <div class="section-header">
-                    <h2>Add Team Member</h2>
-                </div>
-                <div class="add-person-form">
-                    <input type="text" id="personName" placeholder="Enter name..." class="input-field">
-                    <button class="btn btn-primary" id="addPersonBtn">
-                        <span class="btn-icon">➕</span>
-                        Add Person
-                    </button>
+                <div class="section-content-row">
+                    <div class="add-person-left">
+                        <div class="section-header">
+                            <h2>Add Team Member</h2>
+                        </div>
+                        <div class="add-person-form">
+                            <input type="text" id="personName" placeholder="Enter name..." class="input-field">
+                            <button class="btn btn-primary" id="addPersonBtn">
+                                <span class="btn-icon">➕</span>
+                                Add Person
+                            </button>
+                        </div>
+                    </div>
+                    <div class="analog-clock-container">
+                        <div class="analog-clock" id="analogClock">
+                            <div class="clock-face">
+                                <div class="clock-number n12">12</div>
+                                <div class="clock-number n3">3</div>
+                                <div class="clock-number n6">6</div>
+                                <div class="clock-number n9">9</div>
+                                <div class="clock-hand hour-hand" id="hourHand"></div>
+                                <div class="clock-hand minute-hand" id="minuteHand"></div>
+                                <div class="clock-hand second-hand" id="secondHand"></div>
+                                <div class="clock-center"></div>
+                            </div>
+                        </div>
+                        <div class="digital-time" id="digitalTime">00:00:00</div>
+                    </div>
                 </div>
             </section>
 

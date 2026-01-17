@@ -13,6 +13,7 @@ class TimeTracker {
         this.render();
         this.startTimerUpdates();
         this.setDefaultDates();
+        this.startAnalogClock();
     }
 
     // Initialize DOM elements
@@ -782,6 +783,42 @@ class TimeTracker {
             console.error('Error loading from localStorage:', e);
             return null;
         }
+    }
+
+    // Start analog clock
+    startAnalogClock() {
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHand = document.getElementById('secondHand');
+        const digitalTime = document.getElementById('digitalTime');
+
+        const updateClock = () => {
+            const now = new Date();
+            const hours = now.getHours() % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            // Calculate rotation angles
+            const hourDeg = (hours * 30) + (minutes * 0.5);
+            const minuteDeg = (minutes * 6) + (seconds * 0.1);
+            const secondDeg = seconds * 6;
+
+            // Apply rotations
+            if (hourHand) hourHand.style.transform = `rotate(${hourDeg}deg)`;
+            if (minuteHand) minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+            if (secondHand) secondHand.style.transform = `rotate(${secondDeg}deg)`;
+
+            // Update digital time
+            if (digitalTime) {
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(minutes).padStart(2, '0');
+                const s = String(seconds).padStart(2, '0');
+                digitalTime.textContent = `${h}:${m}:${s}`;
+            }
+        };
+
+        updateClock();
+        setInterval(updateClock, 1000);
     }
 }
 

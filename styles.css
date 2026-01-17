@@ -308,6 +308,121 @@ body.admin-mode .admin-indicator {
     max-width: 400px;
 }
 
+/* Section Content Row */
+.section-content-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+.add-person-left {
+    flex: 1;
+}
+
+/* Analog Clock */
+.analog-clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.analog-clock {
+    width: 120px;
+    height: 120px;
+}
+
+.clock-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1e1e35 0%, #16162b 100%);
+    border: 3px solid var(--accent-primary);
+    position: relative;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.clock-number {
+    position: absolute;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.clock-number.n12 {
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.clock-number.n3 {
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+}
+
+.clock-number.n6 {
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.clock-number.n9 {
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+}
+
+.clock-hand {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    border-radius: 4px;
+}
+
+.hour-hand {
+    width: 4px;
+    height: 28px;
+    background: var(--text-primary);
+    margin-left: -2px;
+}
+
+.minute-hand {
+    width: 3px;
+    height: 38px;
+    background: var(--accent-primary);
+    margin-left: -1.5px;
+}
+
+.second-hand {
+    width: 2px;
+    height: 44px;
+    background: var(--accent-secondary);
+    margin-left: -1px;
+}
+
+.clock-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.digital-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+}
+
 /* Persons Grid */
 .persons-grid {
     display: grid;
